@@ -3,6 +3,8 @@ import createSagaMiddleware from 'redux-saga';
 import {persistStore} from 'redux-persist';
 import rootSaga from './saga';
 import rootReducer from './reducer';
+import thunkMiddleware from 'redux-thunk';
+import logger from 'redux-logger';
 
 const bindMiddleware = middleware => {
     if (process.env.NODE_ENV !== 'production') {
@@ -25,14 +27,14 @@ export default (initialState) => {
         store = createStore(
             persistReducer(persistConfig, rootReducer),
             initialState,
-            bindMiddleware([sagaMiddleware])
+            bindMiddleware([sagaMiddleware, thunkMiddleware, logger])
         );
         store.__PERSISTOR = persistStore(store);
     } else {
         store = createStore(
             rootReducer,
             initialState,
-            bindMiddleware([sagaMiddleware])
+            bindMiddleware([sagaMiddleware, thunkMiddleware, logger])
         );
     }
     store.sagaTask = sagaMiddleware.run(rootSaga);

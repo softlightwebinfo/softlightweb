@@ -4,7 +4,7 @@ import Head from 'next/head'
 class Home extends Component {
     static async getInitialProps(props) {
         const {store, isServer} = props;
-        console.log("adios", props.store.getState());
+        // console.log("adios", props.store.getState());
         return {
             isServer,
             namespacesRequired: ['common', 'menu'],

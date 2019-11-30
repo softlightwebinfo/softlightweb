@@ -39,6 +39,7 @@ const nextConfig = {
     exportPathMap: function () {
         return {
             '/': {page: '/'},
+            '/login': {page: '/login'},
             // '/contact': {page: '/contact'},
         }
     }

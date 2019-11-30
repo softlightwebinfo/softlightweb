@@ -1,86 +1,68 @@
 import {actionTypes} from "../actionTypes/user";
 
-export function loadData() {
-    return {type: actionTypes.USER_LOAD_DATA}
-}
 
-export function loadDataSuccess(data) {
+export const authenticateAction = (user) => {
     return {
-        type: actionTypes.USER_LOAD_DATA_SUCCESS,
-        data
+        type: actionTypes.AUTHENTICATE,
+        payload: user
+    };
+};
+
+
+export const deAuthenticateAction = () => {
+    return {
+        type: actionTypes.DEAUTHENTICATE,
+    };
+};
+
+
+export const restoreState = (authState) => {
+    return {
+        type: actionTypes.RESTORE_AUTH_STATE,
+        payload: authState
     }
-}
+};
 
-export function loadDataError(error) {
-    return {
-        type: actionTypes.USER_LOAD_DATA_SUCCESS,
-        error
-    }
-}
 
-export function setLogin(token, user) {
-    return {
-        type: actionTypes.USER_SET_LOGIN,
-        data: {
-            token,
-            user
+export const login = loginDetails => {
+    return async dispatch => {
+        try {
+            dispatch(deAuthenticateAction());
+            // login code. And storing data in result variable
+            dispatch(authenticateAction({}));
+
+
+        } catch (e) {
+            dispatch(deAuthenticateAction());
         }
-    }
-}
+    };
+};
 
-export function setLogout() {
-    return {
-        type: actionTypes.USER_SET_LOGOUT,
-        data: {
-            token: null,
-            user: null
+
+export const signUp = signUpDetails => {
+    return async dispatch => {
+        try {
+            dispatch(deAuthenticateAction());
+            // Signup code. And storing data in result variable
+            dispatch(authenticateAction({}));
+
+
+        } catch (e) {
+            dispatch(deAuthenticateAction());
         }
-    }
-}
+    };
+};
 
-export function userLogin(data) {
-    return (dispatch, getState) => {
-        dispatch(setLogin(data.token, data.user));
-    }
-}
 
-export function userLoginError(data) {
-    return {
-        type: actionTypes.USER_ERROR_LOGIN,
-        data: data
+export const logout = () => {
+    return async dispatch => {
+        dispatch(deAuthenticateAction())
     }
-}
+};
 
-export function startUserVerify(token: string, ctx = null) {
-    return {
-        type: actionTypes.USER_LOAD_VERIFY,
-        token,
-        ctx,
-    }
-}
 
-export function userLogout() {
-    return {
-        type: actionTypes.USER_LOAD_LOGOUT,
-    }
-}
-export function userRegisterLoadData(user) {
-    return {
-        type: actionTypes.USER_UPDATE_LOAD_DATA,
-        data: user,
-    }
-}
-
-export function userSetUpdateError(err) {
-    return {
-        type: actionTypes.USER_UPDATE_LOAD_DATA_ERROR,
-        data: err
-    }
-}
-
-export function userSetUpdateSuccess(user) {
-    return {
-        type: actionTypes.USER_UPDATE_LOAD_DATA_SUCCESS,
-        data: user
-    }
-}
+export const restore = (savedState) => {
+    return dispatch => {
+        dispatch(restoreState(savedState));
+    };
+};

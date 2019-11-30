@@ -1,44 +1,53 @@
 import {actionTypes} from "../actionTypes/user";
+import {Cookies} from "../../libs/Cookies";
 
-export const initialState = {
-    user: null,
+let initialState: any = {
+    user: {},
     token: null,
-    error: false
+    error: false,
+    isLoggedIn: false,
 };
+
+if (typeof localStorage !== "undefined") {
+    const authCookie = Cookies.getCookie('auth');
+    if (authCookie) {
+        initialState = JSON.parse(decodeURIComponent(authCookie));
+    } else {
+        initialState = {
+            isLoggedIn: false,
+            user: {},
+            error: false,
+            token: null,
+        }
+    }
+} else {
+    initialState = {
+        isLoggedIn: false,
+        user: {},
+        error: false,
+        token: null,
+    };
+}
 
 function reducer(state = initialState, action) {
     switch (action.type) {
-        case actionTypes.USER_LOAD_DATA_SUCCESS:
+        case actionTypes.DEAUTHENTICATE:
+            Cookies.removeCookie("auth");
             return {
-                ...state,
-                user: action.user,
-                token: action.token
+                isLoggedIn: false
             };
-        case actionTypes.USER_LOAD_DATA_ERROR:
-            return {
-                ...state,
-                ...{error: action.error}
+        case actionTypes.AUTHENTICATE:
+            const authObj = {
+                isLoggedIn: true,
+                user: action.payload
             };
-        case actionTypes.USER_SET_LOGIN: {
+            Cookies.setCookie("auth", authObj);
+            return authObj;
+        case actionTypes.RESTORE_AUTH_STATE:
             return {
-                ...state,
-                user: action.data.user,
-                token: action.data.token,
-            }
-        }
-        case actionTypes.USER_SET_LOGOUT: {
-            return {
-                ...state,
-                user: action.data.user,
-                token: action.data.token,
-            }
-        }
-        case actionTypes.USER_UPDATE_LOAD_DATA_SUCCESS: {
-            return {
-                ...state,
-                user: action.data
-            }
-        }
+                isLoggedIn: true,
+                user: action.payload.user
+            };
         default:
             return state
     }
