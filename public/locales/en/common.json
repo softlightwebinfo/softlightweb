@@ -1,0 +1,13 @@
+{
+  "hello-world": "Hello, World!",
+  "goto-second-page": "Goto Second Page",
+  "change-language": "Change Language",
+  "welcome": "Welcome To Second Page",
+  "go-back": "Go Back",
+  "menu-top": {
+    "about": "About",
+    "contact": "Contact",
+    "signup": "Sign Up",
+    "signin": "Sign In"
+  }
+}

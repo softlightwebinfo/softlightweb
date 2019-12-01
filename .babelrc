@@ -28,7 +28,8 @@
           "@static": "./static",
           "@hoc": "./src/hoc",
           "@src": "./src",
-          "@pages": "./pages"
+          "@pages": "./pages",
+          "@server": "./server"
         }
       }
     ],

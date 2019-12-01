@@ -35,7 +35,14 @@ const nextConfig = {
         // Will be available on both server and client
         //import getConfig from 'next/config';
         staticFolder: '/static',
-    }
+    },
+    exportPathMap: function () {
+        return {
+            '/': {page: '/'},
+            '/login': {page: '/login'},
+            // '/contact': {page: '/contact'},
+        }
+    },
 };
 
 module.exports = withPlugins([

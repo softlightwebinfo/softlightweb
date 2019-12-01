@@ -7,7 +7,8 @@ import compression from "compression";
 import morgan from "morgan";
 import connectMongo from "connect-mongo";
 import session from "express-session";
-
+import nextI18next from "./i18n";
+import nextI18NextMiddleware from "next-i18next/middleware";
 import api from "./routes";
 
 const server = express();
@@ -31,6 +32,7 @@ app.prepare().then(() => {
 
     // Theseed Custom
     server.use(compression());
+    server.use(nextI18NextMiddleware(nextI18next));
     server.use(morgan("dev"));
 
     // MongoDB
