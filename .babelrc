@@ -21,6 +21,29 @@
       {
         "loose": true
       }
+    ],
+    [
+      "module-resolver",
+      {
+        "root": [
+          "./"
+        ],
+        "alias": {
+          "@components": "./src/components",
+          "@containers": "./src/containers",
+          "@store": "./src/store",
+          "@scss": "./src/scss",
+          "@config": "./src/config",
+          "@models": "./src/models",
+          "@styles": "./src/styles",
+          "@utils": "./src/utils",
+          "@static": "./static",
+          "@hoc": "./src/hoc",
+          "@src": "./src",
+          "@pages": "./pages",
+          "@server": "./server"
+        }
+      }
     ]
   ]
 }

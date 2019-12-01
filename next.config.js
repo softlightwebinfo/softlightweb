@@ -9,13 +9,15 @@ const withSize = require('next-size');
 const withReactSvg = require('next-react-svg');
 const withCSS = require('@zeit/next-css');
 const path = require('path');
+const env = process.env.NODE_ENV || 'development';
+
 const {
     PHASE_PRODUCTION_BUILD,
     PHASE_PRODUCTION_SERVER,
     PHASE_DEVELOPMENT_SERVER,
     PHASE_EXPORT,
 } = require('next-server/constants');
-
+const dev = require(`./src/config/${env}`);
 // next.js configuration
 const nextConfig = {
     // useFileSystemPublicRoutes: false,
@@ -29,12 +31,13 @@ const nextConfig = {
     },
     pageExtensions: ['jsx', 'js', 'tsx', 'ts'],
     env: {
-        customKey: 'value'
+        customKey: 'value',
     },
     publicRuntimeConfig: {
         // Will be available on both server and client
         //import getConfig from 'next/config';
         staticFolder: '/static',
+        ...dev
     },
     exportPathMap: function () {
         return {
@@ -42,6 +45,9 @@ const nextConfig = {
             '/login': {page: '/login'},
             // '/contact': {page: '/contact'},
         }
+    },
+    alias: {
+        "@server": "./server"
     }
 };
 

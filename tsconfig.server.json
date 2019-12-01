@@ -21,13 +21,7 @@
       "./@types",
       "./node_modules/@types"
     ],
-    "baseUrl": "./",
     "alwaysStrict": true,
-    "paths": {
-      "*": [
-        "@types/*"
-      ]
-    },
     "strict": true,
     "removeComments": true,
     "experimentalDecorators": true,
@@ -37,7 +31,49 @@
     "noEmit": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@containers/*": [
+        "./src/containers/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@store/*": [
+        "./src/store/*"
+      ],
+      "@scss/*": [
+        "./src/scss/*"
+      ],
+      "@styles/*": [
+        "./src/styles/*"
+      ],
+      "@models/*": [
+        "./src/models/*"
+      ],
+      "@static/*": [
+        "./static/*"
+      ],
+      "@hoc/*": [
+        "./src/hoc/*"
+      ],
+      "@src/*": [
+        "./src/*"
+      ],
+      "@pages/*": [
+        "./pages/*"
+      ],
+      "@config/*": [
+        "./src/config/*"
+      ],
+      "@server/*": [
+        "./server/*"
+      ]
+    }
   },
   "include": [
     "./server/**/*"

@@ -1,42 +1,55 @@
 // const express = require('express');
 import express from "express";
-
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import next from "next";
-
 import compression from "compression";
 import morgan from "morgan";
-
 import connectMongo from "connect-mongo";
 import session from "express-session";
-
+import LRUCache from "lru-cache";
 import api from "./routes";
+import nextI18next from "./i18n";
+import nextI18NextMiddleware from "next-i18next/middleware";
+import proxy from "http-proxy-middleware";
+import getConfig from 'next/config';
 
 const server = express();
-
-const dev = process.env.NODE_ENV === "development";
-const app = next({ dev });
+const dev = process.env.NODE_ENV !== "production";
+const app = next({dev});
 const defaultRequestHandler = app.getRequestHandler();
-
 const LOCAL_DB = "theseed";
 const MONGODB_URI =
     process.env.MONGODB_URI || `mongodb://localhost/${LOCAL_DB}`;
 // const SESSION_KEY = "connect.sid";
 const SESSION_SECRET = "jfoiesofj@#JIFSIOfsjieo@320923";
 const SESSION_DOMAIN = undefined;
-const PORT = process.env.NODE_ENV === "development" ? 80 : 3000;
+const PORT = process.env.NODE_ENV !== "production" ? 80 : 3000;
+const {publicRuntimeConfig} = getConfig();
+const ssrCache = new LRUCache({
+    max: 100 * 1024 * 1024, /* cache size will be 100 MB using `return n.length` as length() function */
+    length: function (n: any) {
+        return n.length
+    },
+    maxAge: 1000 * 60 * 60 * 24 * 30
+});
 
 app.prepare().then(() => {
     // Parse application/x-www-form-urlencoded
-    server.use(bodyParser.urlencoded({ extended: false }));
+    server.use(bodyParser.urlencoded({extended: false}));
     // Parse application/json
     server.use(bodyParser.json());
 
     // Theseed Custom
     server.use(compression());
+    server.use(nextI18NextMiddleware(nextI18next));
+
     server.use(morgan("dev"));
 
+    server.use('/api-server', proxy({
+        target: publicRuntimeConfig.api,
+        changeOrigin: true,
+    }));
     // MongoDB
     // mongoose.set('debug', true);
     mongoose.Promise = global.Promise;
@@ -97,7 +110,7 @@ app.prepare().then(() => {
             next: express.NextFunction
         ) => {
             console.error(err.stack);
-            return res.status(500).json({ code: 0 });
+            return res.status(500).json({code: 0});
         }
     );
 

@@ -4,15 +4,22 @@ import App from 'next/app';
 import withRedux from 'next-redux-wrapper';
 import {PersistGate} from 'redux-persist/integration/react';
 import reduxStore from './../src/store/reduxStore';
+import {appWithTranslation} from '@server/i18n';
 
-class MyApp extends App {
+// @ts-ignore
+@withRedux(reduxStore)
+@appWithTranslation
+export default class MyApp extends App<{ store: any }> {
     static async getInitialProps({Component, ctx}) {
         const pageProps = Component.getInitialProps
             ? await Component.getInitialProps(ctx)
             : {};
-        return {pageProps};
+        return {
+            pageProps,
+            namespacesRequired: ['common'],
+        };
     }
-    
+
     render() {
         const {Component, pageProps, store} = this.props;
         return (
@@ -24,5 +31,3 @@ class MyApp extends App {
         );
     }
 }
-
-export default withRedux(reduxStore)(MyApp);
