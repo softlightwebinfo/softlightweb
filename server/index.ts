@@ -11,10 +11,11 @@ import nextI18next from "./i18n";
 import nextI18NextMiddleware from "next-i18next/middleware";
 import api from "./routes";
 
-const server = express();
-
+const expressApp = express();
+const server = require('http').createServer(expressApp);
+const io = require('socket.io')(server);
 const dev = process.env.NODE_ENV === "development";
-const app = next({ dev });
+const app = next({dev});
 const defaultRequestHandler = app.getRequestHandler();
 
 const LOCAL_DB = "theseed";
@@ -24,17 +25,31 @@ const MONGODB_URI =
 const SESSION_SECRET = "jfoiesofj@#JIFSIOfsjieo@320923";
 const SESSION_DOMAIN = undefined;
 const PORT = process.env.NODE_ENV === "development" ? 3000 : 3000;
+const proxyMiddleware = require('http-proxy-middleware');
+const shrinkRay = require('shrink-ray-current');
+// socket.io server
+let sockets: any = [];
+io.on('connection', (socket: any) => {
+    console.log('User connect');
+    sockets = [...sockets, socket]
+});
+const graphqlServer = "http://server.com";
+var apiproxy = proxyMiddleware('/graphql', {pathRewrite: {'^/graphql': 'graphql'}, target: graphqlServer});
+var wsproxy = proxyMiddleware('/graphql', {ws: true, target: graphqlServer});
+
 app.prepare().then(() => {
     // Parse application/x-www-form-urlencoded
-    server.use(bodyParser.urlencoded({ extended: false }));
+    expressApp.use(bodyParser.urlencoded({extended: false}));
     // Parse application/json
-    server.use(bodyParser.json());
+    expressApp.use(bodyParser.json());
 
     // Theseed Custom
-    server.use(compression());
-    server.use(nextI18NextMiddleware(nextI18next));
-    server.use(morgan("dev"));
-
+    expressApp.use(compression());
+    expressApp.use(nextI18NextMiddleware(nextI18next));
+    expressApp.use(morgan("dev"));
+    // server.use(shrinkRay());
+    expressApp.use(apiproxy); // the order here is important
+    expressApp.use(wsproxy);
     // MongoDB
     // mongoose.set('debug', true);
     mongoose.Promise = global.Promise;
@@ -48,7 +63,7 @@ app.prepare().then(() => {
 
     // Session
     const MongoStore = connectMongo(session);
-    server.use(
+    expressApp.use(
         session({
             // key: SESSION_KEY,
             secret: SESSION_SECRET,
@@ -67,7 +82,7 @@ app.prepare().then(() => {
     );
 
     // API routes
-    server.use("/api", api);
+    expressApp.use("/api", api);
 
     // Next.js request handling
     const customRequestHandler = (
@@ -82,12 +97,12 @@ app.prepare().then(() => {
 
     // Routes
     // server.get('/', customRequestHandler.bind(undefined, '/'));
-    server.get("/about/:id", customRequestHandler.bind(undefined, "/about"));
-    server.get("*", (req: express.Request, res: express.Response) => {
+    expressApp.get("/about/:id", customRequestHandler.bind(undefined, "/about"));
+    expressApp.get("*", (req: express.Request, res: express.Response) => {
         defaultRequestHandler(req, res);
     });
 
-    server.use(
+    expressApp.use(
         (
             err: any,
             req: express.Request,
@@ -95,7 +110,7 @@ app.prepare().then(() => {
             next: express.NextFunction
         ) => {
             console.error(err.stack);
-            return res.status(500).json({ code: 0 });
+            return res.status(500).json({code: 0});
         }
     );
 
@@ -105,4 +120,3 @@ app.prepare().then(() => {
         );
     });
 });
-
