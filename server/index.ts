@@ -1,4 +1,5 @@
 // const express = require('express');
+require('custom-env').env(process.env.NODE_ENV);
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
@@ -14,7 +15,7 @@ import api from "./routes";
 const expressApp = express();
 const server = require('http').createServer(expressApp);
 const io = require('socket.io')(server);
-const dev = process.env.NODE_ENV === "development";
+const dev = process.env.NODE_ENV !== "production";
 const app = next({dev});
 const defaultRequestHandler = app.getRequestHandler();
 
@@ -33,10 +34,9 @@ io.on('connection', (socket: any) => {
     console.log('User connect');
     sockets = [...sockets, socket]
 });
-const graphqlServer = "http://server.com";
+const graphqlServer = process.env.GRAPHQL_SERVER;
 var apiproxy = proxyMiddleware('/graphql', {pathRewrite: {'^/graphql': 'graphql'}, target: graphqlServer});
 var wsproxy = proxyMiddleware('/graphql', {ws: true, target: graphqlServer});
-
 app.prepare().then(() => {
     // Parse application/x-www-form-urlencoded
     expressApp.use(bodyParser.urlencoded({extended: false}));
